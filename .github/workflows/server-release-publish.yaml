@@ -33,7 +33,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Inventory Image
-        working-dir: server
+        working-directory: server
         run: |
           docker build . --tag ghcr.io/sijoma/godot-mmo-server:${{ github.event.release.tag_name }}
           docker push ghcr.io/sijoma/godot-mmo-server:${{ github.event.release.tag_name }}
