@@ -18,7 +18,7 @@ var (
 
 func main() {
 	flag.Parse()
-
+	fmt.Printf("Heyo")
 	// Define the game hub
 	hub := server.NewHub()
 
