@@ -23,4 +23,4 @@ COPY --from=builder /app/godot-mmo-server .
 
 EXPOSE 8080
 
-ENTRYPOINT["/godot-mmo-server"]
+ENTRYPOINT ["/godot-mmo-server"]
