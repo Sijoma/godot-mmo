@@ -6,6 +6,6 @@
 [node name="Ingame" type="Node"]
 script = ExtResource("1_0uskn")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="."]
 
-[node name="Log" parent="CanvasLayer" instance=ExtResource("1_b7vyf")]
+[node name="Log" parent="UI" instance=ExtResource("1_b7vyf")]
