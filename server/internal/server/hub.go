@@ -1,12 +1,23 @@
 package server
 
 import (
+	"context"
+	_ "embed"
 	"log"
 	"net/http"
 
+	"database/sql"
+	_ "modernc.org/sqlite"
+
+	"github.com/sijoma/godot-mmo/internal/server/db"
 	"github.com/sijoma/godot-mmo/internal/server/objects"
 	"github.com/sijoma/godot-mmo/pkg/packets"
 )
+
+// Embed the database schema to be used when creating the database tables
+//
+//go:embed db/config/schema.sql
+var schemaGenSql string
 
 // A structure for the connected client to interface with the hub
 type ClientInterfacer interface {
@@ -23,6 +34,9 @@ type ClientInterfacer interface {
 
 	// Puts data from another client in the write pump
 	SocketSendAs(message packets.Msg, senderId uint64)
+
+	// A reference to the database transaction context for this client
+	DbTx() *DbTx
 
 	// Forward message to another client for processing
 	PassToPeer(message packets.Msg, peerId uint64)
@@ -52,18 +66,32 @@ type Hub struct {
 
 	// Clients in this channel will be unregistered with the hub
 	UnregisterChan chan ClientInterfacer
+
+	// Database connection pool
+	dbPool *sql.DB
 }
 
 func NewHub() *Hub {
+	dbPool, err := sql.Open("sqlite", "db.sqlite")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return &Hub{
 		Clients:        objects.NewSharedCollection[ClientInterfacer](),
 		BroadcastChan:  make(chan *packets.Packet),
 		RegisterChan:   make(chan ClientInterfacer),
 		UnregisterChan: make(chan ClientInterfacer),
+		dbPool:         dbPool,
 	}
 }
 
 func (h *Hub) Run() {
+	log.Println("Initializing database...")
+	if _, err := h.dbPool.ExecContext(context.Background(), schemaGenSql); err != nil {
+		log.Fatal(err)
+	}
+
 	log.Println("Awaiting client registrations")
 	for {
 		select {
@@ -109,4 +137,17 @@ type ClientStateHandler interface {
 
 	// Cleanup the state handler and perform any last actions
 	OnExit()
+}
+
+// A structure for database transaction context
+type DbTx struct {
+	Ctx     context.Context
+	Queries *db.Queries
+}
+
+func (h *Hub) NewDbTx() *DbTx {
+	return &DbTx{
+		Ctx:     context.Background(),
+		Queries: db.New(h.dbPool),
+	}
 }

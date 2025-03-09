@@ -21,6 +21,8 @@ type WebSocketClient struct {
 
 	state server.ClientStateHandler
 
+	dbTx *server.DbTx
+
 	logger *log.Logger
 }
 
@@ -41,7 +43,10 @@ func NewWebSocketClient(hub *server.Hub, writer http.ResponseWriter, request *ht
 		hub:      hub,
 		conn:     conn,
 		sendChan: make(chan *packets.Packet, 256),
-		logger:   log.New(log.Writer(), "Client unknown: ", log.LstdFlags),
+
+		dbTx: hub.NewDbTx(),
+
+		logger: log.New(log.Writer(), "Client unknown: ", log.LstdFlags),
 	}
 
 	return c, nil
@@ -77,6 +82,10 @@ func (c *WebSocketClient) SetState(state server.ClientStateHandler) {
 		c.state.SetClient(c)
 		c.state.OnEnter()
 	}
+}
+
+func (c *WebSocketClient) DbTx() *server.DbTx {
+	return c.dbTx
 }
 
 func (c *WebSocketClient) ProcessMessage(senderId uint64, message packets.Msg) {
