@@ -1,10 +1,11 @@
 package server
 
 import (
-	"github.com/sijoma/godot-mmo/internal/server/objects"
-	"github.com/sijoma/godot-mmo/pkg/packets"
 	"log"
 	"net/http"
+
+	"github.com/sijoma/godot-mmo/internal/server/objects"
+	"github.com/sijoma/godot-mmo/pkg/packets"
 )
 
 // A structure for the connected client to interface with the hub
@@ -14,6 +15,8 @@ type ClientInterfacer interface {
 
 	// Sets the client's ID and anything else that needs to be initialized
 	Initialize(id uint64)
+
+	SetState(newState ClientStateHandler)
 
 	// Puts data from this client in the write pump
 	SocketSend(message packets.Msg)
@@ -92,4 +95,18 @@ func (h *Hub) Serve(getNewClient func(*Hub, http.ResponseWriter, *http.Request) 
 
 	go client.WritePump()
 	go client.ReadPump()
+}
+
+// A structure for a state machine to process the client's messages
+type ClientStateHandler interface {
+	Name() string
+
+	// Inject the client into the state handler
+	SetClient(client ClientInterfacer)
+
+	OnEnter()
+	HandleMessage(senderId uint64, message packets.Msg)
+
+	// Cleanup the state handler and perform any last actions
+	OnExit()
 }
