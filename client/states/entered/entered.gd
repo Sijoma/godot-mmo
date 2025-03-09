@@ -23,6 +23,6 @@ func _on_ws_packet_received(packet: packets.Packet) -> void:
 	if packet.has_id():
 		_handle_id_msg(sender_id, packet.get_id())
 
-func _handle_id_msg(sender_id: int, id_msg: packets.IdMessage) -> void:
+func _handle_id_msg(_sender_id: int, id_msg: packets.IdMessage) -> void:
 	GameManager.client_id = id_msg.get_id()
 	GameManager.set_state(GameManager.State.INGAME)
