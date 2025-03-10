@@ -42,6 +42,18 @@ func _ready():
 	_collision_shape.radius = radius
 	_nameplate.text = actor_name
 
+
+func _input(event):
+	if is_player and event is InputEventMouseButton and event.is_pressed():
+		match event.button_index:
+			MOUSE_BUTTON_WHEEL_UP:
+				_camera.zoom.x = min(4, _camera.zoom.x + 0.1)
+			MOUSE_BUTTON_WHEEL_DOWN:
+				_camera.zoom.x = max(0.1, _camera.zoom.x - 0.1)
+
+		_camera.zoom.y = _camera.zoom.x
+
+
 func _physics_process(delta) -> void:
 	position += velocity * delta
 	
