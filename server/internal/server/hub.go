@@ -2,11 +2,11 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
 	"log"
 	"net/http"
 
-	"database/sql"
 	_ "modernc.org/sqlite"
 
 	"github.com/sijoma/godot-mmo/internal/server/db"
@@ -23,6 +23,8 @@ var schemaGenSql string
 type ClientInterfacer interface {
 	Id() uint64
 	ProcessMessage(senderId uint64, message packets.Msg)
+
+	SharedGameObjects() *SharedGameObjects
 
 	// Sets the client's ID and anything else that needs to be initialized
 	Initialize(id uint64)
@@ -58,6 +60,8 @@ type ClientInterfacer interface {
 type Hub struct {
 	Clients *objects.SharedCollection[ClientInterfacer]
 
+	SharedGameObjects *SharedGameObjects
+
 	// Packets in this channel will be processed by all connected clients except the sender
 	BroadcastChan chan *packets.Packet
 
@@ -78,7 +82,10 @@ func NewHub() *Hub {
 	}
 
 	return &Hub{
-		Clients:        objects.NewSharedCollection[ClientInterfacer](),
+		Clients: objects.NewSharedCollection[ClientInterfacer](),
+		SharedGameObjects: &SharedGameObjects{
+			Players: objects.NewSharedCollection[*objects.Player](),
+		},
 		BroadcastChan:  make(chan *packets.Packet),
 		RegisterChan:   make(chan ClientInterfacer),
 		UnregisterChan: make(chan ClientInterfacer),
@@ -150,4 +157,9 @@ func (h *Hub) NewDbTx() *DbTx {
 		Ctx:     context.Background(),
 		Queries: db.New(h.dbPool),
 	}
+}
+
+type SharedGameObjects struct {
+	// The ID of the player is the ID of the client
+	Players *objects.SharedCollection[*objects.Player]
 }

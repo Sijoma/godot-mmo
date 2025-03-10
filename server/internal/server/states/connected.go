@@ -11,6 +11,7 @@ import (
 
 	"github.com/sijoma/godot-mmo/internal/server"
 	"github.com/sijoma/godot-mmo/internal/server/db"
+	"github.com/sijoma/godot-mmo/internal/server/objects"
 	"github.com/sijoma/godot-mmo/pkg/packets"
 )
 
@@ -79,6 +80,12 @@ func (c *Connected) handleLoginRequest(senderId uint64, msg *packets.Packet_Logi
 
 	c.logger.Printf("User %s logged in successfully", username)
 	c.client.SocketSend(packets.NewOkResponse())
+
+	c.client.SetState(&InGame{
+		player: &objects.Player{
+			Name: username,
+		},
+	})
 }
 
 func (c *Connected) handleRegisterRequest(senderId uint64, msg *packets.Packet_RegisterRequest) {

@@ -89,6 +89,7 @@ func (c *WebSocketClient) DbTx() *server.DbTx {
 }
 
 func (c *WebSocketClient) ProcessMessage(senderId uint64, message packets.Msg) {
+	c.logger.Printf("process message: %v", senderId, message)
 	c.state.HandleMessage(senderId, message)
 }
 
@@ -188,4 +189,8 @@ func (c *WebSocketClient) Close(reason string) {
 	if _, closed := <-c.sendChan; !closed {
 		close(c.sendChan)
 	}
+}
+
+func (c *WebSocketClient) SharedGameObjects() *server.SharedGameObjects {
+	return c.hub.SharedGameObjects
 }
