@@ -219,8 +219,8 @@ shader_parameter/green_colour = 6.8
 shader_parameter/blue_colour = 10.6
 shader_parameter/time_factor = 1.5
 shader_parameter/move = false
-shader_parameter/resolution = 0.33
-shader_parameter/sin_roll = 0.25
+shader_parameter/resolution = 3.0
+shader_parameter/sin_roll = 0.26
 shader_parameter/cos_roll = 0.62
 shader_parameter/alpha = 0.7
 shader_parameter/mask_texture = SubResource("GradientTexture2D_tk3qr")
@@ -338,14 +338,14 @@ float line(vec2 uv)
 
 vec2 rot(vec2 uv, float a)
 {
-    return uv * mat2(vec2(cos(a), -sin(a)), vec2(sin(a), cos(a)));
+    return uv * mat2(vec2(-cos(a), sin(a)), vec2(-sin(a), -cos(a)));
 }
 
 float flame(vec2 uv, float spread, float p)
 {
 	float col = 1.;
-    col *= line(rot(uv, 3.14 - spread) + vec2(0., p + TIME));
-    col *= line(rot(uv, 3.14 + spread) + vec2(0., p + TIME));
+    col *= line(rot(uv, PI - spread) + vec2(0., p + TIME));
+    col *= line(rot(uv, PI + spread) + vec2(0., p + TIME));
 	return col;
 }
 
