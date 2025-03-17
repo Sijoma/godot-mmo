@@ -20,15 +20,15 @@ var radius: float
 @onready var _camera: Camera2D = $Camera2D
 @onready var _collision_shape: CircleShape2D = $CollisionShape2D.shape
 
-static func instantiate(actor_id: int, actor_name: String, x: float, y: float, radius: float, speed: float, is_player: bool) -> Actor:
+static func instantiate(p_actor_id: int, p_actor_name: String, p_x: float, p_y: float, p_radius: float, p_speed: float, p_is_player: bool) -> Actor:
 	var actor := Scene.instantiate()
-	actor.actor_id = actor_id
-	actor.actor_name = actor_name
-	actor.start_x = x
-	actor.start_y = y
-	actor.start_rad = radius
-	actor.speed = speed
-	actor.is_player = is_player
+	actor.actor_id = p_actor_id
+	actor.actor_name = p_actor_name
+	actor.start_x = p_x
+	actor.start_y = p_y
+	actor.start_rad = p_radius
+	actor.speed = p_speed
+	actor.is_player = p_is_player
 
 	return actor
 

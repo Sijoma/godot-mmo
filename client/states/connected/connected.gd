@@ -8,7 +8,7 @@ var _action_on_ok_received: Callable
 @onready var _password_field: LineEdit = $UI/VBoxContainer/Password
 @onready var _login_button: Button = $UI/VBoxContainer/HBoxContainer/LoginButton
 @onready var _register_button: Button = $UI/VBoxContainer/HBoxContainer/RegisterButton
-@onready var _log: Log = $UI/VBoxContainer/Log
+@onready var _log: Log = $UI/Log
 
 func _ready() -> void:
 	WS.packet_received.connect(_on_ws_packet_received)
