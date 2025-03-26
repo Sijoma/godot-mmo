@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand/v2"
 	"net/http"
+	"time"
 
 	_ "modernc.org/sqlite"
 
@@ -108,6 +109,9 @@ func (h *Hub) Run() {
 		h.SharedGameObjects.Spores.Add(h.newSpore())
 	}
 
+	// Replenish spores async
+	go h.replenishSporesLoop(2 * time.Second)
+
 	log.Println("Awaiting client registrations")
 	for {
 		select {
@@ -172,6 +176,36 @@ func (h *Hub) newSpore() *objects.Spore {
 	sporeRadius := max(rand.NormFloat64()*3+10, 5)
 	x, y := objects.SpawnCoords(sporeRadius, h.SharedGameObjects.Players, h.SharedGameObjects.Spores)
 	return &objects.Spore{X: x, Y: y, Radius: sporeRadius}
+}
+
+func (h *Hub) replenishSporesLoop(rate time.Duration) {
+	ticker := time.NewTicker(rate)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		sporesRemaining := h.SharedGameObjects.Spores.Len()
+		diff := MaxSpores - sporesRemaining
+
+		if diff <= 0 {
+			continue
+		}
+
+		log.Printf("%d spores remain - going to replenish %d spores", sporesRemaining, diff)
+
+		// Don't really want to spawn too many at a time, otherwise it can cause a lag spike
+		for i := 0; i < min(diff, 10); i++ {
+			spore := h.newSpore()
+			sporeId := h.SharedGameObjects.Spores.Add(spore)
+
+			h.BroadcastChan <- &packets.Packet{
+				SenderId: 0,
+				Msg:      packets.NewSpore(sporeId, spore),
+			}
+
+			// Sleep a bit to avoid lag spikes
+			time.Sleep(50 * time.Millisecond)
+		}
+	}
 }
 
 type SharedGameObjects struct {

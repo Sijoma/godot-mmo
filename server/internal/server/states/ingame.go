@@ -62,6 +62,8 @@ func (g *InGame) HandleMessage(senderId uint64, message packets.Msg) {
 		g.handleSporeConsumed(senderId, message)
 	case *packets.Packet_PlayerConsumed:
 		g.handlePlayerConsumed(senderId, message)
+	case *packets.Packet_Spore:
+		g.handleSpore(senderId, message)
 	}
 }
 
@@ -159,6 +161,10 @@ func (g *InGame) handleSporeConsumed(senderId uint64, message *packets.Packet_Sp
 	go g.client.SharedGameObjects().Spores.Remove(sporeId)
 
 	g.client.Broadcast(message)
+}
+
+func (g *InGame) handleSpore(senderId uint64, message *packets.Packet_Spore) {
+	g.client.SocketSendAs(message, senderId)
 }
 
 func (g *InGame) getSpore(sporeId uint64) (*objects.Spore, error) {
