@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"math/rand/v2"
 	"time"
 
 	"github.com/sijoma/godot-mmo/internal/server"
@@ -36,8 +35,7 @@ func (g *InGame) OnEnter() {
 	go g.client.SharedGameObjects().Players.Add(g.player, g.client.Id())
 
 	// Set the initial properties of the player
-	g.player.X = rand.Float64() * 1000
-	g.player.Y = rand.Float64() * 1000
+	g.player.X, g.player.Y = objects.SpawnCoords(g.player.Radius, g.client.SharedGameObjects().Players, nil)
 	g.player.Speed = 150.0
 	g.player.Radius = 20.0
 

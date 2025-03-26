@@ -89,7 +89,7 @@ func (c *WebSocketClient) DbTx() *server.DbTx {
 }
 
 func (c *WebSocketClient) ProcessMessage(senderId uint64, message packets.Msg) {
-	c.logger.Printf("process message: %v", senderId, message)
+	c.logger.Printf("process message: %v, %s", senderId, message)
 	c.state.HandleMessage(senderId, message)
 }
 

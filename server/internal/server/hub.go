@@ -170,7 +170,7 @@ func (h *Hub) NewDbTx() *DbTx {
 
 func (h *Hub) newSpore() *objects.Spore {
 	sporeRadius := max(rand.NormFloat64()*3+10, 5)
-	x, y := objects.SpawnCoords()
+	x, y := objects.SpawnCoords(sporeRadius, h.SharedGameObjects.Players, h.SharedGameObjects.Spores)
 	return &objects.Spore{X: x, Y: y, Radius: sporeRadius}
 }
 
