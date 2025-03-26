@@ -10,8 +10,8 @@ func _ready() -> void:
 	WS.packet_received.connect(_on_ws_packet_received)
 
 	_log.info("Connecting to server...")
-	#WS.connect_to_url("wss://913a-2a00-6020-a585-6600-b115-22b9-9693-a594.ngrok-free.app/ws")
-	WS.connect_to_url("ws://localhost:8080/ws")
+	WS.connect_to_url("wss://17ec-2a00-6020-a585-6600-7c88-b831-e9d9-432e.ngrok-free.app/ws")
+	#WS.connect_to_url("ws://localhost:8080/ws")
 
 func _on_ws_connected_to_server() -> void:
 	_log.info("Connected to server")
